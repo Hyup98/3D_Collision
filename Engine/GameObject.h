@@ -31,6 +31,11 @@ public:
     void setPosion(Vec3 pos);
     void setMass(float mass);
     void setRadius(float);
+    void addVelocity(Vec3 vel);
+    void applyVelocity();
+    void intiTemVel();
+    void chage();
+
 
     Vec3 getVelocity() const;
     Vec3 getPosion() const;
@@ -47,5 +52,7 @@ private:
     Vec3 mVelocity;
     float mMass;
     float mRadius;
+    Vec3 mTemVelocity;
+    bool isChanged;
 };
 

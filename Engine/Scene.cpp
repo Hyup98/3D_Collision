@@ -34,18 +34,19 @@ std::wstring s2ws1(const std::string& s)
 
 void Scene::Update()
 {
-    shared_ptr<GameObject> a[7];
+    shared_ptr<GameObject> a[8];
     for (const shared_ptr<GameObject>& gameObject : _gameObjects)
     {
         gameObject->Update();
+        gameObject->intiTemVel();
     }
 
-    for (size_t i = 0; i < 7; i++)
+    for (size_t i = 0; i < 8; i++)
         a[i] = _gameObjects[i + 1];
     
     for (auto target : a)
     {
-        for (size_t i = 0; i < 7; i++)
+        for (size_t i = 0; i < 8; i++)
         {
             if (target == a[i])
                 continue;
@@ -67,12 +68,17 @@ void Scene::Update()
                     float size = a0Nor.Dot(-(target->getVelocity()));
                     Vec3 temVel = target->getVelocity() + (size * a0Nor);
                     temVel = temVel + (size * a0Nor);
-                    Vec3 _vec = temVel + a[i]->getVelocity();
-                    _vec.Normalize();
-                    target->setVelocity(_vec);
+                    Vec3 _vec = temVel;
+                    target->addVelocity(_vec);
+                    target->chage();
                 }
             }
         }
+    }
+
+    for (auto target : a)
+    {
+        target->applyVelocity();
     }
 }
 

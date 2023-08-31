@@ -46,6 +46,8 @@ void GameObject::Start()
 
 void GameObject::Update()
 {
+    mVelocity.Normalize();
+    mVelocity *= 2.f;
     for (shared_ptr<Component>& component : _components)
     {
         if (component)
@@ -59,17 +61,17 @@ void GameObject::Update()
     Vec3 tem = GetTransform()->GetLocalPosition() + mVelocity;
 
     //화면 밖을 나가려고 하면 충돌 후 안으로 방향 바꾸기
-    if (tem.x >= -300 && tem.x <= 300 
-        && tem.y >= -200 && tem.y <= 400 
-        && tem.z >= 500 && tem.z <= 1010)
+    if (tem.x > -300 && tem.x < 300 
+        && tem.y > -200 && tem.y < 400 
+        && tem.z > 500 && tem.z < 1010)
     {
-        GetTransform()->SetLocalPosition(tem + mVelocity);
+        GetTransform()->SetLocalPosition(tem);
     }
     else
     {
-        if (tem.x >= -300 && tem.x <= 300
+        if (tem.x > -300 && tem.x < 300
             && tem.y < -200
-            && tem.z >= 500 && tem.z <= 1010)//바닥
+            && tem.z > 500 && tem.z < 1010)//바닥
         {
             Vec3 a0Nor{ 0.f, 1.f, 0.f };
             float size = a0Nor.Dot(-(mVelocity));
@@ -78,8 +80,8 @@ void GameObject::Update()
             mVelocity = temVel;
         }
         else if (tem.x < -300
-            && tem.y >= -200 && tem.y <= 400 
-        && tem.z >= 500 && tem.z <= 1010)//벽1
+            && tem.y > -200 && tem.y < 400 
+        && tem.z > 500 && tem.z < 1010)//벽1
         {
             Vec3 a0Nor{ 1.f, 0.f, 0.f };
             float size = a0Nor.Dot(-(mVelocity));
@@ -88,8 +90,8 @@ void GameObject::Update()
             mVelocity = temVel;
         }
         else if (tem.x > 300
-            && tem.y >= -200 && tem.y <= 400
-            && tem.z >= 500 && tem.z <= 1010)//벽2
+            && tem.y > -200 && tem.y < 400
+            && tem.z > 500 && tem.z < 1010)//벽2
         {
             Vec3 a0Nor{ -1.f, 0.f, 0.f };
             float size = a0Nor.Dot(-(mVelocity));
@@ -97,8 +99,8 @@ void GameObject::Update()
             temVel = temVel + (size * a0Nor);
             mVelocity = temVel;
         }
-        else if (tem.x >= -300 && tem.x <= 300
-            && tem.y >= -200 && tem.y <= 400
+        else if (tem.x > -300 && tem.x < 300
+            && tem.y > -200 && tem.y < 400
             && tem.z < 500)//벽1
         {
             Vec3 a0Nor{ 0.f, 0.f, 1.f };
@@ -107,8 +109,8 @@ void GameObject::Update()
             temVel = temVel + (size * a0Nor);
             mVelocity = temVel;
         }
-        else if (tem.x >= -300 && tem.x <= 300
-            && tem.y >= -200 && tem.y <= 400
+        else if (tem.x > -300 && tem.x < 300
+            && tem.y > -200 && tem.y < 400
             && tem.z > 1010)//벽1
         {
             Vec3 a0Nor{ 0.f, 0.f, -1.f };
@@ -125,6 +127,8 @@ void GameObject::Update()
             temVel = temVel + (size * a0Nor);
             mVelocity = temVel;
         }
+        tem = GetTransform()->GetLocalPosition() + mVelocity;
+        GetTransform()->SetLocalPosition(tem);
     }
 
 }
@@ -244,4 +248,32 @@ float GameObject::getMass() const
 float GameObject::getRadius() const
 {
     return mRadius;
+}
+
+void GameObject::addVelocity(Vec3 vel)
+{
+    mTemVelocity += vel;
+}
+
+void GameObject::applyVelocity()
+{
+    if (isChanged)
+    {
+        mVelocity = mTemVelocity;
+        mVelocity.Normalize();
+        mVelocity *= 1.5;
+    }
+}
+
+void GameObject::intiTemVel()
+{
+    mTemVelocity.x = 0;
+    mTemVelocity.y = 0;
+    mTemVelocity.z = 0;
+    isChanged = false;
+}
+
+void GameObject::chage()
+{
+    isChanged = true;
 }
